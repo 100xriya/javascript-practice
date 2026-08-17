@@ -694,3 +694,50 @@ async function main() {
 main();
 // Oops Done
 // task1() fulfills with "A", but that value is only going into Promise.all() internally. You never console.log("A")
+
+// -------------------------------------this and its methods----------------------//
+// q1- -------- this and binding context 
+const person = {
+    name: "Riya",
+
+    greet() {
+        console.log(this.name);
+    }
+};
+
+person.greet();
+// prints Riya. bcz this===person
+
+const fn = person.greet();
+// undefined
+
+const boundGreet = person.greet.bind(person);
+// binds this permanently set to person
+
+
+// q2- call -> method for this
+function greet() {
+    console.log(this.name);
+}
+
+const person = {
+    name: "Riya"
+};
+
+// call-> Immediately executes the function. Takes arguments individually.
+greet.call(person);
+
+// q3- call: with arguments
+function greet(message) {
+    console.log(message + ", " + this.name);
+}
+
+const person = {
+    name: "Riya"
+};
+
+greet.call(person, "Hello");
+// person → this ; "Hello" → message
+
+// apply -> immediately executes the function, arguments in an array
+greet.apply(person, ["Hello", "Good morning"]);
