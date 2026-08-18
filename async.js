@@ -64,21 +64,25 @@ console.log("4");
 setTimeout(function () {
     console.log("5");
 }, 0);
+// 1 4 2 5 3
 
-// PROMISE 
+//-------------------------------- PROMISE-----------------------------------// 
 console.log("Start");
 
 const promise = new Promise(function () {
+    // executor fn execute immediately
     console.log("Inside Promise");
 });
 
 console.log("End");
+// output- Start Inside promise end-> 
 
 // q2
 console.log("Start");
 
 const promise = new Promise(function (resolve) {
     console.log("A");
+    // changed the status of promise-> fulfilled. ; .then enter microtask, executes after callstack.
     resolve("Pizza");
     console.log("B");
 });
@@ -88,10 +92,11 @@ promise.then(function (value) {
 });
 
 console.log("End");
+// output - start A B End Pizza
 
-// q3
+// q3 callstack+ microtask(.then()) + callback(setTimeout)
 console.log("Start");
-
+// setTimeout enter callback queue
 setTimeout(() => {
     console.log("Timeout");
 }, 0);
@@ -101,20 +106,22 @@ Promise.resolve().then(() => {
 });
 
 console.log("End");
+// Start End Promise Timeout
 
 // q4
 const promise = new Promise(function (resolve, reject) {
-
+    // once the status has been changed it cant be modified or return back
     resolve("A");
-
+    // this is ignored
     reject("B");
 
 });
+// final state => fulfilled
 
 // q5
 const pizzaPromise = new Promise(function (resolve) {
 
-    resolve("🍕 Pizza");
+    resolve("Pizza");
 
 });
 
@@ -123,6 +130,9 @@ pizzaPromise.then(function (value) {
     console.log(value);
 
 });
+console.log("Done");
+// output- Done Pizza
+
 
 // q6 Promise Execution Order
 console.log("1");
@@ -138,8 +148,9 @@ promise.then(function (value) {
 });
 
 console.log("4");
+// 1 2 3 4 Hello
 
-// PROMISE CHAINING............
+// ...................................PROMISE CHAINING............
 // Q1
 const promise = Promise.resolve(5);
 
@@ -148,7 +159,7 @@ const newPromise = promise.then(function (value) {
 });
 console.log(promise);
 console.log(newPromise);
-
+// Promise { 5 } ; Promise { <pending> }
 
 // q2 event loop 
 console.log("Start");
@@ -158,6 +169,7 @@ Promise.resolve().then(() => console.log("Promise"));
 setTimeout(() => console.log("Timer"), 0);
 
 console.log("End");
+// Start end promise timer
 
 // -----------------------------------async------------------------//
 
@@ -166,6 +178,7 @@ async function greet() {
     return "Hello";
 }
 console.log(greet());
+// Promise { 'Hello' }
 
 //q2 to print the value inside function 
 async function greet() {
@@ -175,15 +188,17 @@ async function greet() {
 greet().then(function (value) {
     console.log(value);
 });
+// Hello
 
-// q3 also returns promise
+// q3 
 async function add(a, b) {
     return a + b;
 }
 console.log(add(2, 3));
+// Promise { 5 }
 add(2, 3).then(function (value) {
     console.log(value);
-
+    // 5
 })
 
 // q4 order of execution of .then() 
@@ -219,7 +234,7 @@ greet().then(function (value) {
 
 console.log("End");
 
-// with await
+// with await -> pauses current async fn until promise is fulfilled 
 async function main() {
 
     const value = await greet();
@@ -339,6 +354,7 @@ async function main() {
 main();
 
 console.log("C");
+// A C Hello B
 
 // q6b write .then() version
 async function greet() {
@@ -356,6 +372,7 @@ async function main() {
 main();
 
 console.log("C");
+// A C Hello B
 
 // execution order
 async function greet() {
@@ -447,6 +464,7 @@ async function main() {
 main();
 
 console.log("C");
+// output - A C X Y B
 // it pauses twice but resumes in next microtask again but there is nothing in sync js so resumes instantaneously
 
 // q1 how an async function can return a value, and how another async function can await that value.
@@ -570,6 +588,32 @@ main();
 console.log("C");
 // A C Error B
 
+// q2
+function fetchUserData() {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            // if reject statement is before resolve then the state will be reject, error statement will show from catch
+            // reject("Error 404!!") 
+            resolve({ name: "john", id: "45435" })
+        }, 3000);
+    });
+}
+
+async function getUserData() {
+    try {
+        // w/o await this line will show only the pending promise not the value extracted.
+        const userData = await fetchUserData();
+        console.log(userData);
+        console.log("Data Fetched succesfully!");
+
+    } catch (error) {
+        console.log("Error fetching data", error);
+
+    }
+}
+getUserData();
+
+
 // q2 Does catch run w/o error? NO.
 async function getData() {
     return "Success";
@@ -654,12 +698,10 @@ async function getPosts() {
     return "Posts";
 }
 async function main() {
-    const [user, posts] = await Promise.all([
-        // Promise.all() itself returns one Promise containing both values 
-        // Promise → fulfilled with ["User", "Posts"]
-        getUser(),
-        getPosts()
-    ]);
+    const [user, posts] = await Promise.all([getUser(), getPosts()]);
+    // Promise.all() itself returns one Promise containing both values 
+    // takes arrays as an parameter 
+    // Promise → fulfilled with ["User", "Posts"]
 
     console.log(user);
     console.log(posts);
@@ -698,7 +740,7 @@ main();
 // -------------------------------------this and its methods----------------------//
 // q1- -------- this and binding context 
 const person = {
-    name: "Riya",
+    name: "Gina",
 
     greet() {
         console.log(this.name);
@@ -706,7 +748,7 @@ const person = {
 };
 
 person.greet();
-// prints Riya. bcz this===person
+// prints Gina. bcz this===person
 
 const fn = person.greet();
 // undefined
@@ -721,7 +763,7 @@ function greet() {
 }
 
 const person = {
-    name: "Riya"
+    name: "Amy"
 };
 
 // call-> Immediately executes the function. Takes arguments individually.
@@ -733,7 +775,7 @@ function greet(message) {
 }
 
 const person = {
-    name: "Riya"
+    name: "Jake"
 };
 
 greet.call(person, "Hello");
